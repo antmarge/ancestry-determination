@@ -1,0 +1,113 @@
+# Local ancestry pipeline using RFMIX
+# Margaret Antonio
+# Sometime before 7/29/2019
+
+# Variables and filepaths are here
+include: "snakemake_variables.py"
+
+
+######### AUXILIARY FUNCTIONS ###############
+
+# Function to expand rfmix outputs
+# Easier than rewriting the root filename
+def getRfmixOutputs(root):
+	ext = ["fb.tsv", "rfmix.Q", "msp.tsv", "sis.tsv"]
+	return [root + "." + e for e in ext]
+
+#################################################
+
+
+
+#################### Rules #######################
+
+# Rule all is the desired output. 
+# See Snakemake documentation for more info.
+rule all:
+    input:
+       # Get RFMIX output files
+       expand(RUN + "/output/rfmix_{sample}_chr{chr}_gen{gen}_crf{crf}_{pops}.fb.tsv", 
+		sample = SAMPLES, chr = CHROMS, gen = GENERATIONS, crf = CRF_WEIGHT, pops = POP_TYPE),
+       # Create karyogram image for each sample
+       expand(RUN + "/karyogram/{sample}_gen{gen}_crf{crf}_{pops}.png", 
+		sample = SAMPLES, gen = GENERATIONS, crf = CRF_WEIGHT, pops = POP_TYPE)
+
+
+# Runs RFmix for one sample and one chromosome
+rule run_rfmix:
+    input:
+        sample_vcf = lambda wildcards: sample_file_dict[wildcards.sample], # dictionary of sample:filepath created in snakeamke_variables.py
+	ref_vcf = REF_VCF,
+	ref_popfile = POP_FILE,
+        genetic_map = GENETIC_MAP
+    output: 
+        getRfmixOutputs(RUN + "/output/rfmix_{sample}_chr{chr}_gen{gen}_crf{crf}_{pops}"),
+    params:
+        nthreads = 3, # change this to the number of threads available
+	pops_used = TEMP_FILE,
+        output_prefix = lambda wildcards, output: output[0][:-7]
+    benchmark: RUN + "/benchmarks/rfmix_{sample}_chr{chr}_gen{gen}_crf{crf}_{pops}.benchmark" 
+    shell:"""
+	# Get correct population designation (super pop or sub pop)
+        awk -F'\t' -v c="{wildcards.pops}" '
+		NR==1{{for (i=1; i<=NF; i++) if ($i==c){{p=i; break}}; next}} 
+		{{print $1,$p}}' > {params.pops_used}
+        # Run RFmix
+        {RFMIX} \
+                --random-seed=1 \
+		--debug \
+                --n-threads={params.nthreads} \
+                --generations={wildcards.gen} \
+		--crf-weight={wildcards.crf} \
+                -f {input.sample_vcf} \
+                -r {input.ref_vcf} \
+                -m {params.pops_used} \
+                -g {input.genetic_map} \
+                -o {params.output_prefix} \
+                --chromosome={wildcards.chr} 
+    """
+
+# Plots a karyogram from RFmix output
+# Script is downloaded from Alicia Martin's github
+rule plot_karyogram:
+     input:
+        script = KARYOGRAM_SCRIPT,
+        msp = expand(RUN + "/output/rfmix_{{sample}}_chr{chr}_gen{{gen}}_crf{{crf}}_{{pops}}.msp.tsv", chr = CHROMS),
+     output:
+        png = RUN + "/karyogram/{sample}_gen{gen}_crf{crf}_{pops}.png",
+        msp = RUN + "/output/{sample}_gen{gen}_crf{crf}_{pops}.concat.msp.tsv"
+     params:
+        pops_used = TEMP_FILE
+     shell:
+        """
+        # Just get pop names in alphabetical order
+        # WARNING: pretty sure it should be alphabetical
+        # Check though
+        pop_names=$(awk '{{print $2}}' {params.pops_used} | sort | uniq)
+        # Conda environment or change to python 2 activation (e.g. module load)
+        source activate python27
+        cat {input.msp} | grep -v \# > {output.msp}
+        # Makes sure the bed file is formatted correctly
+        awk -F'\t' '{{print $1,$2,$3,$7,$4,$5}}' {output.msp} | sed 's/ /\t/g' > {output.msp}.A.bed
+        awk -F'\t' '{{print $1,$2,$3,$8,$4,$5}}' {output.msp} | sed 's/ /\t/g' > {output.msp}.B.bed
+        python {input.script} \
+            --bed_a {output.msp}.A.bed \
+            --bed_b {output.msp}.B.bed \
+            --ind {wildcards.sample} \
+            --out {output.png} \
+            --centromeres /scratch/PI/pritch/AncientRome/analyses/rfmix/centromeres_hg19.bed \
+            --pop_order $pop_names     
+        source deactivate    
+        """
+ 
+
+ # Add new rule that call summary script
+ #
+ #
+ #
+ #
+ #
+
+
+
+
+################ END ##################      

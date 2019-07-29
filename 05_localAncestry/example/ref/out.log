@@ -1,0 +1,16 @@
+
+VCFtools - 0.1.14
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--gzvcf /scratch/groups/pritch/Margaret/AncientRome/2b-RefPanelProcess/datasets/TKGpanel/beagle/chr21/chr21.1kg.phase3.v5a.biSNPs.maf05.vcf.gz
+	--keep 1000Genomes_poplabels_small20.txt
+	--recode
+	--stdout
+
+Using zlib version: 1.2.11
+Keeping individuals in 'keep' list
+After filtering, kept 400 out of 2504 Individuals
+Outputting VCF file...
+After filtering, kept 100160 out of a possible 100160 Sites
+Run Time = 101.00 seconds

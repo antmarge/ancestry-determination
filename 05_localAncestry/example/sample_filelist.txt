@@ -1,0 +1,7 @@
+Bedouin1	/scratch/groups/pritch/Margaret/pipelines/local-ancestry/example/sample_files/Bedouin_HGDP006010_chr21.vcf.gz
+Bedouin2	/scratch/groups/pritch/Margaret/pipelines/local-ancestry/example/sample_files/Bedouin_HGDP00607_chr21.vcf.gz
+Bedouin3	/scratch/groups/pritch/Margaret/pipelines/local-ancestry/example/sample_files/Bedouin_HGDP00608_chr21.vcf.gz
+Bedouin4	/scratch/groups/pritch/Margaret/pipelines/local-ancestry/example/sample_files/Bedouin_HGDP00609_chr21.vcf.gz
+Egyptian1	/scratch/groups/pritch/Margaret/pipelines/local-ancestry/example/sample_files/Egyptian_Egypt10_chr21.vcf.gz
+Egyptian2	/scratch/groups/pritch/Margaret/pipelines/local-ancestry/example/sample_files/Egyptian_Egypt2_chr21.vcf.gz
+Egyptian3	/scratch/groups/pritch/Margaret/pipelines/local-ancestry/example/sample_files/Egyptian_Egypt3_chr21.vcf.gz

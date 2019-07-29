@@ -1,0 +1,34 @@
+{
+    "__default__" :
+    {
+        "queue"     : "pritch,owners,normal,hns",
+        "nodes"     : 1,
+        "cpus"     : 1,
+        "memory"    : "5GB",
+        "time"      : "5:00:00",
+        "name"      : "{rule}.{wildcards.sample}_{wildcards.crf}",
+        "output"    : "{wildcards.RUN}/slurm/{rule}.{wildcards.sample}.out",
+        "error"     : "{wildcards.RUN}/slurm/{rule}.{wildcards.sample}.err"
+    },
+    "run_rfmix":
+    {
+       "time"    : "03:00:00",
+       "queue"   : "pritch,owners,hns,normal",
+       "memory"  : "15GB",
+       "cpus"    : "{params.nthreads}",
+       "output": "{RUN}/slurm/{rule}_{wildcards.sample}_chr{wildcards.chr}_crf{wildcards.crf}_gen{wildcards.gen}_{wildcards.pops}Pop.out",
+       "error": "{RUN}/slurm/{rule}_{wildcards.sample}_chr{wildcards.chr}_crf{wildcards.crf}_gen{wildcards.gen}_{wildcards.pops}Pop.err"
+     },
+    "plot_karyogram":
+    {
+       "time"    : "00:10:00",
+       "cpus"    : "1",
+       "memory"  : "4G",
+       "queue"   : "owners,pritch,normal,hns",
+       "output": "{RUN}/slurm/{rule}_{wildcards.sample}_crf{wildcards.crf}_gen{wildcards.gen}_{wildcards.pops}Pop.out",
+       "error": "{RUN}/slurm/{rule}_{wildcards.sample}_crf{wildcards.crf}_gen{wildcards.gen}_{wildcards.pops}Pop.err"
+     }
+
+    
+
+}
